@@ -6,7 +6,7 @@ const SECRET_KEY = process.env.SECRET_KEY;
 
 const registerApi = async (req, res) => {
     try {
-        const { username, email, password, address } = req.body;
+        const { username, email, password, role } = req.body;
         const existingUser = await user.findOne({ email });
 
         if (existingUser) {
@@ -18,7 +18,7 @@ const registerApi = async (req, res) => {
             username,
             email,
             password: hashedPassword,
-            address
+            role
         });
         await userData.save();
         res.status(201).json({ message: `Welcome, ${userData.username}! you seccessfully registered in our portal` });
@@ -38,7 +38,7 @@ const loginApi = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ message: "Invalid password" });
         }
-        const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: registeredUser._id, role: registeredUser.role }, SECRET_KEY, { expiresIn: '1h' });
         res.json({ token });
     } catch (err) {
         console.error(err);
@@ -46,4 +46,5 @@ const loginApi = async (req, res) => {
     }
 };
 
-export default { registerApi, loginApi };
+
+export default { registerApi, loginApi};

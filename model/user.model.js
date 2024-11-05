@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     email: {
         type: String,
@@ -15,14 +16,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         minLength: 5
     },
-    address: {
-        city: String,
-        state: String,
-        country: String
+    role: {
+        type: String,
+        required: true,
+        enum: ['manager', 'team-lead', 'developer', 'tester']
     },
     createdAt: {
         type: Date,
-        default: Date.now()
+        default: Date.now
     }
 });
 

@@ -3,13 +3,17 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 import mongoConnection from "./config/db.js";
-import router from "./routes/user.routes.js";
+import userRouter from "./routes/user.routes.js";
+import taskRouter from "./routes/task.routes.js";
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(express.json());
-app.use("/api/user", router);
+
+app.use("/api/user", userRouter);
+app.use("/api/tasks", taskRouter);
+
 app.use(cors({
     origin: "http://localhost:3000",
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
