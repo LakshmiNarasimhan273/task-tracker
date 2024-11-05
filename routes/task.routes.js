@@ -1,5 +1,5 @@
 import express from "express";
-import taskController "../controller/task.controller.js";
+import taskController from "../controller/task.controller.js";
 import isRole from "../middleware/roleMiddleware.js";
 
 const router = express();

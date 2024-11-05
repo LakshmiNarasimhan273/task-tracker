@@ -34,7 +34,7 @@ const loginApi = async (req, res) => {
         if (!registeredUser) {
             return res.status(404).json({ message: "User mail doesn't exist" });
         };
-        const passwordMatch = await bcrypt.compare(password, user.password);
+        const passwordMatch = await bcrypt.compare(password, registeredUser.password);
         if (!passwordMatch) {
             return res.status(401).json({ message: "Invalid password" });
         }
