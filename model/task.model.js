@@ -25,6 +25,7 @@ const taskSchema = mongoose.Schema({
         required: true,
         index: true
     },
+    // Need to add a indidual task timer
     assignedDate: {
         type: Date,
         default: Date.now,
