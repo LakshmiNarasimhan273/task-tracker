@@ -1,5 +1,5 @@
 import user from "../model/user.model.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 const SECRET_KEY = process.env.SECRET_KEY;
