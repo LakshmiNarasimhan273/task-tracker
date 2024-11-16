@@ -89,5 +89,41 @@ const endTask = async (req, res) => {
     }
 };
 
+const getUserTasks = async (req, res) => {
+    try {
+        // Fetch the user from token
+        const { userId, role } = req.user;
 
-export default { createTask, startTask, endTask };
+        // Allow only developers and testers to access this API
+        if (!["developer", "tester"].includes(role)) {
+            return res.status(403).json({
+                message: "Access denied! Only Developers and Testers can view assigned tasks.",
+            });
+        }
+
+        // Find all tasks assigned to this user
+        const tasks = await Task.find({ assignedPerson: userId }).populate("assignedPerson", "username email role");
+
+        if (!tasks.length) {
+            return res.status(404).json({
+                message: "No tasks assigned to you yet.",
+            });
+        }
+        const totalTasks = tasks.length;
+
+        // Return task details
+        res.status(200).json({
+            message: "Tasks retrieved successfully",
+            totalTasks: totalTasks,
+            tasks,
+        });
+    } catch (error) {
+        console.error("Error in getUserTasks:", error.message);
+        res.status(500).json({
+            message: `Failed to fetch tasks: ${error.message}`,
+        });
+    }
+};
+
+
+export default { createTask, startTask, endTask, getUserTasks };

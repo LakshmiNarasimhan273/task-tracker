@@ -8,5 +8,7 @@ router.post("/create-tasks", isRole(["manager", "team-lead"]), taskController.cr
 router.post("/:taskId/start", isRole(["developer", "tester"]), taskController.startTask);
 router.post("/:taskId/end", isRole(["developer", "tester"]), taskController.endTask);
 
+router.get("/my-tasks", isRole(["developer", "tester"]), taskController.getUserTasks);
+
 
 export default router;
