@@ -10,7 +10,7 @@ const registerApi = async (req, res) => {
         const existingUser = await user.findOne({ email });
 
         if (existingUser) {
-            return res.status(400).json({ message: "User email already exist" });
+            return res.status(403).json({ message: "User email already exist" });
         }
         const salt = 10;
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -21,7 +21,7 @@ const registerApi = async (req, res) => {
             role
         });
         await userData.save();
-        res.status(201).json({ message: `Welcome, ${userData.username}! you seccessfully registered in our portal` });
+        res.status(201).json({ message: `Welcome! ${userData.username}, user profile created`});
     } catch (err) {
         res.status(500).json({ message: `Internal Server error,${err.message}` });
     }
@@ -39,7 +39,7 @@ const loginApi = async (req, res) => {
             return res.status(401).json({ message: "Invalid password" });
         }
         const token = jwt.sign({ userId: registeredUser._id, role: registeredUser.role }, SECRET_KEY, { expiresIn: '1h' });
-        res.json({ token });
+        res.json({ token: token, message: "Login successful" });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Authentication failed" });
