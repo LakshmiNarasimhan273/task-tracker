@@ -1,3 +1,5 @@
+// User routes
+
 import express from "express";
 import userController from "../controller/user.controller.js";
 import isRole from "../middleware/roleMiddleware.js";

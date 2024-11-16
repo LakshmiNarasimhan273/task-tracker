@@ -1,56 +1,60 @@
 import mongoose from "mongoose";
-
 const taskSchema = mongoose.Schema({
     taskTitle: {
         type: String,
-        required: true,
+        required: true
     },
     taskPriority: {
         type: String,
         required: true,
-        enum: ["low" ,"medium", "high", "blocker"]
+        enum: ["low", "medium", "high", "blocker"]
     },
     taskDescription: {
         type: String,
         required: true,
-        minLength: 40,
+        minLength: 40
     },
     taskStatus: {
         type: String,
         required: true,
-        enum:["assigned", "in-progress", "qc-assigned", "qc-completed"]
+        enum: ["assigned", "in-progress", "qc-assigned", "qc-completed"],
+        default: "assigned"
     },
     assignedPerson: {
-        type: String,
-        required: true,
-        index: true
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
     },
-    // Need to add a indidual task timer
     assignedDate: {
         type: Date,
-        default: Date.now,
-        required: true
+        default: Date.now
     },
     dueDate: {
         type: Date,
-        required: true,
-        validate: {
-            validator: function (value){
-                return value > this.assignedDate;
-            },
-            message: "Due date must be after the assigned date."
-        }
-    }
+        required: true
+    },
+    startTime: {
+        type: Date,
+        default: null
+    }, // When the task work begins
+    endTime: {
+        type: Date,
+        default: null
+    },   // When the task work ends
+    timeSpent: {
+        type: Number,
+        default: 0
+    },  // Total time spent (in seconds)
 });
 
-taskSchema.pre('save', async function (next) {
-    const user = await mongoose.model("User").findOne({ username: this.assignedPerson });
-
-    if(!user){
-        return next(new Error("Assigned person not found in user collection"));
+// Method to calculate time spent
+taskSchema.methods.calculateTimeSpent = function () {
+    if (this.startTime && this.endTime) {
+        const timeDiff = (this.endTime - this.startTime) / 1000; // Convert milliseconds to seconds
+        this.timeSpent = Math.round(timeDiff);
     }
-    next();
-});
+};
 
-const task = mongoose.model("Task", taskSchema);
-export default task;    
+// In task.model.js
+const Task = mongoose.model("Task", taskSchema);
+export default Task;

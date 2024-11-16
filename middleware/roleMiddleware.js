@@ -1,29 +1,23 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+const isRole = (allowedRoles) => (req, res, next) => {
+    const token = req.header("Authorization")?.split(" ")[1]; // Extract token from header
 
-dotenv.config();
-
-// Middleware for finding the login person is a valid person to create and assign a task, that shows
-// only we need to find the the credentials that matches the role of manager or team-lead, export the 
-// isRole function and import it into the task.routes.js file
-const isRole = (allowedRole) => (req, res, next) => {
-    const token = req.header("Authorization")?.split(" ")[1];
-
-    if(!token){
-        return res.json(401).json({message: "Access denied"});
+    if (!token) {
+        return res.status(401).json({ message: "Access denied: No token provided" });
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        req.user = decoded;
+        const decoded = jwt.verify(token, process.env.SECRET_KEY); // Verify token
+        req.user = decoded; // Attach user data to the request object
 
-        if(!allowedRole.includes(decoded.role)){
-            return res.status(401).json({ message: "Access denind" });
+        if (!allowedRoles.includes(decoded.role)) {
+            return res.status(403).json({ message: "Access denied: Insufficient privileges" });
         }
-        next();
-    } catch (error) {
-        res.status(500).json({ message: "Couldn't authenticate you right now, please try some other time" });
-    }
-}
 
+        next(); // Proceed to the next middleware or controller
+    } catch (error) {
+        console.error("JWT Verification Error:", error.message);
+        res.status(500).json({ message: "Failed to authenticate token. Try again later." });
+    }
+};
 export default isRole;

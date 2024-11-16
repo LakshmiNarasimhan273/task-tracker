@@ -20,6 +20,13 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
+// Centeralized error-handling to catch uncaught errors
+app.use((err, req, res, next) => {
+    console.error("Server Error:", err.message);
+    res.status(500).json({ message: "Internal Server Error" });
+});
+
+
 mongoConnection().then(() => {
     app.listen(port, () => console.log(`Server up and running on port http://localhost:${port}`)
     );
