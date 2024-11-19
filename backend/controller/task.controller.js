@@ -37,6 +37,55 @@ const createTask = async (req, res) => {
     }
 };
 
+const updateTaskStatus = async (req, res) => {
+    try {
+        const { taskId } = req.params; // Get task ID from URL
+        const { taskStatus } = req.body; // Get new status from request body
+        const { userId, role } = req.user; // Extract user ID and role from token
+
+        // Validate the task exists
+        const task = await Task.findById(taskId);
+        if (!task) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        // Role-based status update rules
+        if (["developer", "tester"].includes(role)) {
+            // Developers/Testers can only update specific statuses
+            if (
+                (task.taskStatus === "assigned" && taskStatus === "in-progress") ||
+                (task.taskStatus === "in-progress" && taskStatus === "qc-assigned")
+            ) {
+                task.taskStatus = taskStatus; // Update status
+                await task.save();
+                return res.status(200).json({ message: "Task status updated successfully", task });
+            } else {
+                return res.status(403).json({
+                    message:
+                        "Access denied! You can only update status from 'assigned' to 'in-progress' or 'in-progress' to 'qc-assigned'.",
+                });
+            }
+        } else if (["manager", "team-lead"].includes(role)) {
+            // Managers/Team Leads can update to any status
+            const validStatuses = ["assigned", "in-progress", "qc-assigned", "qc-completed"];
+            if (!validStatuses.includes(taskStatus)) {
+                return res.status(400).json({ message: "Invalid status provided" });
+            }
+
+            task.taskStatus = taskStatus; // Update status
+            await task.save();
+            return res.status(200).json({ message: "Task status updated successfully", task });
+        } else {
+            return res.status(403).json({
+                message: "Access denied! You do not have permission to update the task status.",
+            });
+        }
+    } catch (error) {
+        console.error("Error in updateTaskStatus:", error.message);
+        res.status(500).json({ message: `Failed to update task status: ${error.message}` });
+    }
+};
+
 
 const startTask = async (req, res) => {
     try {
@@ -126,4 +175,4 @@ const getUserTasks = async (req, res) => {
 };
 
 
-export default { createTask, startTask, endTask, getUserTasks };
+export default { createTask, updateTaskStatus , startTask, endTask, getUserTasks };
