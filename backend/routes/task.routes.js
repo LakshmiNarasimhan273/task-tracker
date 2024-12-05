@@ -11,4 +11,6 @@ router.post("/:taskId/end", isRole(["developer", "tester"]), taskController.endT
 router.get("/my-tasks", isRole(["developer", "tester"]), taskController.getUserTasks);
 router.patch("/update-task-status/:taskId", isRole(["manager", "team-lead", "developer", "tester"]), taskController.updateTaskStatus);
 
+router.delete("/:taskId", isRole(["manager", "team-lead"]), taskController.deleteTask);
+
 export default router;
