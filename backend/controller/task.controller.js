@@ -174,5 +174,35 @@ const getUserTasks = async (req, res) => {
     }
 };
 
+const deleteTask = async (req, res) => {
+    try {
+        const { taskId } = req.params;
+        const userRole = req.user.role; // Assume role is extracted from JWT middleware
 
-export default { createTask, updateTaskStatus , startTask, endTask, getUserTasks };
+        // Restrict access to managers and team-leads
+        if (!["manager", "team-lead"].includes(userRole)) {
+            return res.status(403).json({
+                message: "Access denied! Only Managers and Team Leads can delete tasks.",
+            });
+        }
+
+        // Find the task and delete it
+        const task = await Task.findById(taskId);
+        if (!task) {
+            return res.status(404).json({ message: "Task not found" });
+        }
+
+        await task.deleteOne(); // Delete the task
+        res.status(200).json({
+            message: "Task deleted successfully",
+            taskId,
+        });
+    } catch (error) {
+        console.error("Error in deleteTask:", error.message);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+
+
+export default { createTask, updateTaskStatus , deleteTask ,startTask, endTask, getUserTasks };
