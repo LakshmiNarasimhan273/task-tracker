@@ -29,11 +29,15 @@ const Register = () => {
     }
 
     try {
-      await apiClient.post('/api/user/register', formData);
+      await apiClient.post('http://localhost:3001/api/user/register', formData);
       toast.success('Registration successful!');
       setFormData({ username: '', email: '', password: '', role: '' });
+      console.log(formData);
+      
     } catch (error) {
       toast.error('Registration failed!');
+      console.error(error);
+      
     }
   };
 
@@ -51,7 +55,7 @@ const Register = () => {
               value={formData.username}
               onChange={handleChange}
               fullWidth
-              required
+              // required
             />
           </Grid>
           <Grid item xs={12}>
@@ -62,7 +66,7 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               fullWidth
-              required
+              // required
             />
           </Grid>
           <Grid item xs={12}>
@@ -73,11 +77,11 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               fullWidth
-              required
+              // required
             />
           </Grid>
           <Grid item xs={12}>
-            <FormControl fullWidth required>
+            <FormControl fullWidth>
               <InputLabel>Role</InputLabel>
               <Select
                 name="role"
